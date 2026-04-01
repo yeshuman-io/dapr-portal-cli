@@ -8,4 +8,4 @@ Short checks when this repository is the OpenClaw **workspace** (see [OpenClaw b
 
 Optional **offline** smoke: `pytest` from repo root (no network).
 
-Optional **network** smoke (downloads/cache Rosetta layers): `dapr list-csv` or `dapr scout --lat -37.8 --lon 144.9` — skip on slow or air-gapped gateway startup if your policy prefers.
+Optional **network** smoke: `dapr list-csv`, `dapr list-layers`, or `dapr scout --lat -37.8 --lon 144.9` — skip on slow or air-gapped gateway startup if your policy prefers.

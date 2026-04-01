@@ -18,6 +18,8 @@ from dapr_portal.portal import (
     fetch_rosetta_layer,
     fetch_static,
     iter_static_powercor_links,
+    portal_map_line_layer_hints,
+    rosetta_line_txt_from_portal_strings,
 )
 from dapr_portal.candidates import (
     DEFAULT_METRO_MELBOURNE_BBOX,
@@ -70,12 +72,17 @@ def cmd_config(args: argparse.Namespace) -> int:
     with _client(args.timeout) as client:
         html = fetch_portal_html(client, args.base_url)
         session = PortalSession.from_html(html, args.base_url)
+    txt_layers = rosetta_line_txt_from_portal_strings(session.strings)
     payload = {
         "base_url": session.base_url,
         "serve_timestamp": session.serve_timestamp,
         "aes_key_hex_preview": session.key_hex[:16] + "…",
         "csv_paths": session.csv_paths(),
         "static_hrefs": iter_static_powercor_links(html),
+        "rosetta_line_txt_layers": txt_layers,
+        "rosetta_map_layer_hints": portal_map_line_layer_hints(
+            session.strings, downloadable_txt_basenames=set(txt_layers)
+        ),
     }
     print(json.dumps(payload, indent=2))
     return 0
@@ -95,6 +102,39 @@ def cmd_list_static(args: argparse.Namespace) -> int:
         html = fetch_portal_html(client, args.base_url)
     for p in iter_static_powercor_links(html):
         print(p)
+    return 0
+
+
+def cmd_list_layers(args: argparse.Namespace) -> int:
+    with _client(args.timeout) as client:
+        html = fetch_portal_html(client, args.base_url)
+        session = PortalSession.from_html(html, args.base_url)
+    txt_layers = rosetta_line_txt_from_portal_strings(session.strings)
+    hints = portal_map_line_layer_hints(
+        session.strings, downloadable_txt_basenames=set(txt_layers)
+    )
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "rosetta_line_txt_layers": txt_layers,
+                    "rosetta_map_layer_hints": hints,
+                    "rosetta_cdn_base": ROSETTA_LAYER_BASE,
+                },
+                indent=2,
+            )
+        )
+        return 0
+    for name in txt_layers:
+        print(name)
+    if args.include_hints and hints:
+        print(
+            "# Other *kV*...*Line* ids from portal strings (not embedded as Rosetta .txt URLs; "
+            "may be map-only / different API — not guaranteed fetchable via dapr get-layer):",
+            file=sys.stderr,
+        )
+        for h in hints:
+            print(f"#   {h}", file=sys.stderr)
     return 0
 
 
@@ -581,7 +621,8 @@ def build_parser() -> argparse.ArgumentParser:
             "Phase 3 — ranked report: `dapr report --from-json screen.json`. "
             "Optional Vicmap Address: `dapr enrich-parcels --sites ... --with-addresses` "
             "(or `dapr screen ... --enrich-parcels --with-addresses`). "
-            "Batch DC screen: `dapr dc-screen --out-dir ./runs` (see docs/dc_screening.md)."
+            "Batch DC screen: `dapr dc-screen --out-dir ./runs` (see docs/dc_screening.md). "
+            "Rosetta line .txt names: `dapr list-layers` then `dapr scout --layers …`."
         ),
     )
     p.add_argument(
@@ -610,6 +651,25 @@ def build_parser() -> argparse.ArgumentParser:
         "list-static", help="List ./powercor_data/ document links from the portal HTML"
     )
     sc.set_defaults(func=cmd_list_static)
+
+    sc = sub.add_parser(
+        "list-layers",
+        help=(
+            "List Rosetta polyline line-layer .txt names embedded in the portal HTML "
+            "(use with dapr scout --layers …); optional map-only hints on stderr"
+        ),
+    )
+    sc.add_argument(
+        "--json",
+        action="store_true",
+        help="Print JSON with rosetta_line_txt_layers, rosetta_map_layer_hints, rosetta_cdn_base",
+    )
+    sc.add_argument(
+        "--include-hints",
+        action="store_true",
+        help="Print extra *kV*...*Line* portal string tokens to stderr (not verified as .txt downloads)",
+    )
+    sc.set_defaults(func=cmd_list_layers)
 
     sc = sub.add_parser(
         "get-csv",
@@ -685,8 +745,9 @@ def build_parser() -> argparse.ArgumentParser:
         nargs="*",
         default=None,
         help=(
-            "Rosetta layer .txt filenames (default: 22 kV Powercor + CitiPower). "
-            "Examples: 11kV_CitiPower_Powercor_Lines.txt 6.6kV_CitiPower_Powercor_Lines.txt"
+            "Rosetta layer .txt filenames (default: 22 kV Powercor + CitiPower only). "
+            "See `dapr list-layers` for .txt names embedded in the portal; "
+            "e.g. 11kV_CitiPower_Powercor_Lines.txt 6.6kV_CitiPower_Powercor_Lines.txt"
         ),
     )
     sc.add_argument(
@@ -877,7 +938,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--layers",
         nargs="*",
         default=None,
-        help="Rosetta line layers for scout (default: 22 kV + 11 kV as in dapr scout)",
+        help="Rosetta line layers for scout (default: 22 kV Powercor + CitiPower; see list-layers)",
     )
     sc_screen.add_argument(
         "--top-k",
@@ -1297,7 +1358,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--layers",
         nargs="*",
         default=None,
-        help="Rosetta line layers for DAPR proximity (default: 22 kV + 11 kV)",
+        help="Rosetta line layers for DAPR proximity (default: 22 kV pair; see list-layers)",
     )
     sc_vas.add_argument(
         "--top-k",

@@ -12,6 +12,10 @@
 6. Loads the **DAPR LGA summary** CSV **once** and joins by resolved LGA (`dapr_table_match`).
 7. Optionally queries **Vicmap Property** (`--with-parcels`) and **Vicmap Address** (`--addresses none|all|shortlist`).
 
+## Rosetta `--layers`
+
+Default line layers are the **22 kV** Powercor + CitiPower Rosetta `.txt` files only. To score against **other voltages** the portal publishes as polyline exports, run **`dapr list-layers`** and pass the printed basenames to **`--layers`** (same flag as `dapr scout`). The portal may list **higher-voltage map layers** that are **not** embedded as Rosetta `.txt` URLs — those appear as hints in **`dapr list-layers --include-hints`** / **`dapr config`** and may need other data sources.
+
 ## What this is not
 
 - **No proof of available MW**, substation headroom, or connection feasibility — engage the DNSP.

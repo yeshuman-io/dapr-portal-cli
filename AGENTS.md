@@ -23,6 +23,7 @@ A **Python package** (`dapr_portal/`) exposing the **`dapr`** command-line tool 
 
 ## Playbooks
 
+- **`dapr list-layers`** / **`dapr config`** — discover Rosetta `.txt` line layers embedded in the portal (for **`--layers`**); JSON includes `rosetta_map_layer_hints` for map-only ids.
 - **`skills/dapr-portal/SKILL.md`** — screening workflows, CLI chains, merge step for scout + enrich + report.
 - **[README.md](README.md)** — install, disclaimers, OpenClaw checklist.
 - **[BOOT.md](BOOT.md)** — short bootstrap for OpenClaw gateway startup.

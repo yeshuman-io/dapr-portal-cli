@@ -3,8 +3,8 @@ name: dapr-portal
 description: >-
   Runs DAPR portal CLI workflows and Victorian site screening using dapr scout, screen, report,
   enrich-parcels, dc-screen, and vic address-scan. Use when the user asks about DAPR CSVs,
-  22kV proximity, Vicmap parcels or addresses, industrial candidates, planning overlays,
-  LGA joins, or gist-style summaries of address-scan runs.
+  Rosetta map line layers or voltages, Vicmap parcels or addresses, industrial candidates,
+  planning overlays, LGA joins, or gist-style summaries of address-scan runs.
 ---
 
 # dapr-portal workspace skill
@@ -18,6 +18,8 @@ This workspace is **dapr-portal-cli**: command `dapr` ([README.md](../../README.
 ```bash
 dapr --help
 dapr list-csv
+dapr list-layers              # .txt line layers embedded in portal (use with --layers)
+dapr list-layers --json       # includes rosetta_map_layer_hints for map-only ids
 dapr scout --lat LAT --lon LON -o out.json
 dapr scout --sites examples/vic_candidates.csv -o scout.json
 dapr report --from-json scout.json --format json -o report.json
@@ -27,6 +29,12 @@ dapr vic gist-report --out-dir ./runs --run-id RUN_ID -o gist.md
 ```
 
 `gh` is **optional** — only for `dapr vic gist-report --gh-create`.
+
+## Line layers and voltages
+
+- **Default** `scout` / `screen` / `dc-screen` / `vic address-scan` use **two 22 kV** Rosetta polyline files.
+- **More distribution voltages** (e.g. 6.6, 11, 12.7 kV) appear in **`dapr list-layers`** — pass them as extra **`--layers`** arguments.
+- The DAPR **map** may show **transmission**-style labels in portal strings; if they are **not** in `list-layers` as `.txt`, they are **not** loaded the same way — use **AEMO / TNSP** (e.g. AusNet) geometry for those use cases.
 
 ## Full report with Vicmap addresses
 

@@ -23,6 +23,12 @@ uv run dapr --help
 uv run pytest
 ```
 
+## Rosetta line layers (map voltages)
+
+- **Defaults** for `scout` / `screen` / `dc-screen` / `vic address-scan` are the two **22 kV** Rosetta polyline files only.
+- **`dapr list-layers`** queries the live portal HTML and prints every **`.txt` line layer** whose Rosetta URL is embedded there (typically includes **6.6 kV, 11 kV, 12.7 kV, 22 kV** distribution layers). Pass those names to **`--layers`**.
+- **`dapr config`** JSON also includes **`rosetta_line_txt_layers`** and **`rosetta_map_layer_hints`**. Hints are other `*kV*…*Line*` strings from the portal (e.g. labels for transmission on the map); they are **not** guaranteed to download as the same Rosetta `.txt` format — use AEMO/TNSP data for transmission if needed.
+
 ## Documentation
 
 | Doc | Topic |

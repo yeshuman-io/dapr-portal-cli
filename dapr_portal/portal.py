@@ -16,6 +16,12 @@ ROSETTA_LAYER_BASE = (
     "https://content.rosettaanalytics.com.au/citipower_powercor_layers_serve_2025/"
 )
 
+# Embedded portal URLs point at .../citipower_powercor_layers_serve_<YEAR>/basename.txt?...
+_ROSETTA_LINE_TXT_URL_RE = re.compile(
+    r"https?://[^/\s]+/citipower_powercor_layers_serve_\d+/([^?#\s]+\.txt)(?:[?#]|$)",
+    re.IGNORECASE,
+)
+
 _ARRAY_RE = re.compile(r"var _0x7b70=\[(.*?)\];", re.DOTALL)
 _SERVE_TS_RE = re.compile(
     r'const t="/serve\.php\?file=",e="&timestamp=(\d+)"'
@@ -157,6 +163,65 @@ class PortalSession:
 
     def csv_paths(self) -> list[str]:
         return iter_csv_paths(self.strings)
+
+
+def rosetta_line_txt_from_portal_strings(strings: Iterable[str]) -> list[str]:
+    """
+    Basenames of polyline line layers whose Rosetta ``.txt`` download URLs appear in the
+    portal HTML string table. These names work with ``fetch_rosetta_layer`` / ``dapr scout --layers``.
+    """
+    seen: set[str] = set()
+    out: list[str] = []
+    for s in strings:
+        if not s or ".txt" not in s:
+            continue
+        m = _ROSETTA_LINE_TXT_URL_RE.search(s)
+        if m:
+            name = m.group(1).strip()
+            if name and name not in seen:
+                seen.add(name)
+                out.append(name)
+    return sorted(out)
+
+
+def portal_map_line_layer_hints(
+    strings: Iterable[str],
+    *,
+    downloadable_txt_basenames: set[str],
+) -> list[str]:
+    """
+    Other ``*kV*...*Line*`` tokens from the portal string table (map layer ids, legends metadata).
+    They may appear on the DAPR map UI but are **not** present as Rosetta ``.txt`` URLs in the
+    same table — they are not guaranteed to load via ``fetch_rosetta_layer`` with a ``.txt`` suffix.
+    """
+    dl_roots = set()
+    for x in downloadable_txt_basenames:
+        dl_roots.add(x[:-4] if x.lower().endswith(".txt") else x)
+    seen: set[str] = set()
+    out: list[str] = []
+    for raw in strings:
+        s = raw.strip().lstrip("#").strip()
+        if not s or len(s) > 120:
+            continue
+        if s.startswith("http") or s.startswith("./"):
+            continue
+        if "powercor_data" in s:
+            continue
+        sl = s.lower()
+        if ".csv" in sl or ".zip" in sl or ".png" in sl or "legend" in sl:
+            continue
+        if "kv" not in sl:
+            continue
+        if "line" not in sl:
+            continue
+        root = s[:-4] if sl.endswith(".txt") else s
+        if root in dl_roots:
+            continue
+        if root in seen:
+            continue
+        seen.add(root)
+        out.append(s)
+    return sorted(out, key=str.lower)
 
 
 def fetch_portal_html(client: httpx.Client, base_url: str = DEFAULT_BASE_URL) -> str:
