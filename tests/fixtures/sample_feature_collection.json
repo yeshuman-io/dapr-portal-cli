@@ -1,0 +1,26 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": 101,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [144.9, -37.85],
+            [144.91, -37.85],
+            [144.91, -37.84],
+            [144.9, -37.84],
+            [144.9, -37.85]
+          ]
+        ]
+      },
+      "properties": {
+        "OBJECTID": 7,
+        "ZONE_CODE": "IN1Z",
+        "LGA": "TEST_LGA"
+      }
+    }
+  ]
+}

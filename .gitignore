@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+
+# Batch run outputs (dc-screen, vic address-scan)
+runs/
+
+# Local scratch (keep examples/ in repo for colleagues)
+tmp_*.json
+tmp_*.md
+tmp_vic_candidates.csv

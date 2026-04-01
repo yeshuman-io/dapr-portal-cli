@@ -1,0 +1,27 @@
+[
+  {
+    "site_name": "far_then_friction",
+    "query": { "lat": -37.9, "lon": 145.1 },
+    "nearest": [{ "distance_m": 500.0, "circuit": "A" }],
+    "vicmap_parcels": [
+      { "parcel_spi": "S1", "parcel_lga_code": "312" }
+    ],
+    "candidate_attributes": { "LGA": "CASEY" }
+  },
+  {
+    "site_name": "closer_more_friction",
+    "query": { "lat": -37.91, "lon": 145.11 },
+    "nearest": [{ "distance_m": 100.0, "circuit": "B" }],
+    "vicmap_parcels": [
+      { "parcel_spi": "S2", "parcel_lga_code": "312" }
+    ]
+  },
+  {
+    "site_name": "closest_no_friction",
+    "query": { "lat": -37.92, "lon": 145.12 },
+    "nearest": [{ "distance_m": 50.0, "circuit": "C" }],
+    "vicmap_parcels": [
+      { "parcel_spi": "S3", "parcel_lga_code": "312" }
+    ]
+  }
+]
