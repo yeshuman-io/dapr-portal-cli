@@ -35,6 +35,7 @@ uv run pytest
 |-----|--------|
 | [dc_screening.md](dapr_portal/docs/dc_screening.md) | Tiled industrial seed screening (`dc-screen`) |
 | [vic_address_scan.md](dapr_portal/docs/vic_address_scan.md) | Full Vicmap address tile scan, gist report, `gh` (optional) |
+| [transmission_data_sources.md](dapr_portal/docs/transmission_data_sources.md) | Higher-voltage / transmission GIS beyond DAPR Rosetta (Vic + national pointers) |
 
 ## Disclaimers
 

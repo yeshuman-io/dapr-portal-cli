@@ -9,7 +9,7 @@ A **Python package** (`dapr_portal/`) exposing the **`dapr`** command-line tool 
 | Path | Purpose |
 |------|--------|
 | `dapr_portal/` | Library + CLI implementation |
-| `dapr_portal/docs/` | Long-form docs (dc screening, Vic address scan) |
+| `dapr_portal/docs/` | Long-form docs (dc screening, Vic address scan, transmission data pointers) |
 | `dapr_portal/data/` | Packaged data (e.g. `vic_lga_codes.csv`) |
 | `tests/` | `pytest` suite (mocked HTTP; no network required) |
 | `skills/` | **OpenClaw workspace skills** (AgentSkills-style `SKILL.md`) |

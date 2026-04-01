@@ -34,7 +34,7 @@ dapr vic gist-report --out-dir ./runs --run-id RUN_ID -o gist.md
 
 - **Default** `scout` / `screen` / `dc-screen` / `vic address-scan` use **two 22 kV** Rosetta polyline files.
 - **More distribution voltages** (e.g. 6.6, 11, 12.7 kV) appear in **`dapr list-layers`** — pass them as extra **`--layers`** arguments.
-- The DAPR **map** may show **transmission**-style labels in portal strings; if they are **not** in `list-layers` as `.txt`, they are **not** loaded the same way — use **AEMO / TNSP** (e.g. AusNet) geometry for those use cases.
+- The DAPR **map** may show **transmission**-style labels in portal strings; if they are **not** in `list-layers` as `.txt`, they are **not** loaded the same way. See **[transmission_data_sources.md](../../dapr_portal/docs/transmission_data_sources.md)** for Vic MapShare, Data Vic easements, Geoscience Australia, AEMO, AusNet GridView—**not yet wired into `dapr scout`**.
 
 ## Full report with Vicmap addresses
 
